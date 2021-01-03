@@ -10,7 +10,7 @@
             "args": [
                 "build",
                 "--project",
-                "src/earth-no"
+                "src/earth-now"
             ],
             "group": "build",
             "presentation": {
@@ -26,6 +26,38 @@
                 "watch",
                 "--project",
                 "src/earth-now",
+                "run"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "build-daemon",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build",
+                "--project",
+                "src/wall-daemon"
+            ],
+            "group": "build",
+            "presentation": {
+                "reveal": "never"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "watch-deamon",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "watch",
+                "--project",
+                "src/wall-daemon",
                 "run"
             ],
             "group": "test",
