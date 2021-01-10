@@ -1,11 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>wall_daemon</RootNamespace>
+    <RootNamespace>Continuum.WallDaemon</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Core/Wallpaper.fs" />
+    <Compile Include="Core/Windows.fs" />
+    <Compile Include="Core/Daemon.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
