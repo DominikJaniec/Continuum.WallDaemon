@@ -8,6 +8,7 @@
     <Compile Include="Core/Wallpaper.fs" />
     <Compile Include="Core/Windows.fs" />
     <Compile Include="Core/Daemon.fs" />
+    <Compile Include="CLI/Arguments.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <Import Project=".paket\Paket.Restore.targets" />
