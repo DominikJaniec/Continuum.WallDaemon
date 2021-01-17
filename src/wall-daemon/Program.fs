@@ -2,7 +2,6 @@ namespace Continuum.WallDaemon
 
 open System
 open Continuum.WallDaemon.CLI
-open Continuum.WallDaemon.Core
 
 
 module Program =
@@ -18,22 +17,28 @@ module Program =
         ;  fail = 100
         |}
 
-    let printerr (message: string) =
+    let printErr (message: string) =
         Console.Error.WriteLine(message)
 
-    let printout (message: string) =
+    let printOut (message: string) =
         Console.WriteLine(message)
 
+    let debugOut (message: string) =
+        // System.Diagnostics.Debug.WriteLine(message)
+        printOut $"DEBUG: {message}"
 
-    type Args = Argu.ParseResults<Arguments.Args>
+    let environment =
+        { new ArgsHandler.IEnv with
 
-    let execute (args: Args) =
-        let rnd = System.Random()
-        if rnd.NextDouble () > 0.5 then
-            Daemon.setWallpaperDemo ()
-            |> Ok
-        else
-            Error ("Ups...", 42)
+            override _.debugOut (message: string) : unit =
+                debugOut message
+
+            override _.printErr (message: string) : unit =
+                printErr message
+
+            override _.printOut (message: string) : unit =
+                printOut message
+        }
 
 
     [<EntryPoint>]
@@ -42,23 +47,27 @@ module Program =
         if argv |> Array.isEmpty then
             [ banner
             ; Arguments.help ()
-            ] |> List.iter printout
+            ] |> List.iter printOut
 
             exit.successful
 
         else
             match argv |> Arguments.parse with
             | Error msg ->
-                printerr msg
+                printErr msg
                 exit.invalid
 
             | Ok args ->
-                sprintf "Got arguments: %A" args
-                |> printout
+                $"Got arguments: %A{args}"
+                |> debugOut
 
-                match args |> execute with
+                let executionResult =
+                    (environment, args)
+                    ||> ArgsHandler.execute
+
+                match executionResult with
                 | Error (msg, code) ->
-                    printerr msg
+                    printErr msg
                     exit.fail
                     + code
 
