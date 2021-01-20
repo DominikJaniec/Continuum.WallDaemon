@@ -2,6 +2,7 @@ namespace Continuum.WallDaemon.CLI
 
 open Argu
 open Continuum.WallDaemon.Core
+open Continuum.WallDaemon.Sources
 
 
 module Arguments =
@@ -39,36 +40,30 @@ module Arguments =
                 | List_Tags -> "list known identity tags."
 
 
-    type JumpMode =
-        | Designed
-        | Random
-        | Shuffle
-        | Sequential
-
     let wallConst =
-        {| WallStyle = WallStyle.Fit
-        ;  JumpMode = JumpMode.Designed
-        ;  ByProviders = [ "catalog"; "file-path" ]
+        {| NextMode = NextMode.Designed
+        ;  WallStyle = WallStyle.Fit
+        ;  ByProviders = Index.identities
         |}
 
     type WallArgs =
+        | Next of NextMode option
         | Fit of WallStyle option
-        | Next of JumpMode option
         | By of source_identity: string
         | By_Config of items: string list
 
         interface IArgParserTemplate with
             member arg.Usage: string =
                 match arg with
+                | Next _ ->
+                    "set next Wallpaper using mode for current config."
+                    + defaultsToCase wallConst.NextMode
                 | Fit _ ->
                     "use given image fit style for desktop Wallpaper."
                     + defaultsToCase wallConst.WallStyle
-                | Next _ ->
-                    "set next Wallpaper using mode for current config."
-                    + defaultsToCase wallConst.JumpMode
                 | By _ ->
-                    "identity of current Wallpapers source service."
-                    + "\nIt is unique profile identity-tag of provider type-name."
+                    "identity of current Wallpapers source-provider service."
+                    + "\nIt is unique profile identity-tag or provider type-name."
                     + " An identity is build to match: <unique-name@provider> tag format."
                     + " Depending of provider, an additional configuration could be required."
                     + possibleItemsAs "providers" wallConst.ByProviders
