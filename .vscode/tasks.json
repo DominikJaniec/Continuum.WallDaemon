@@ -4,38 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build-server",
-            "command": "dotnet",
-            "type": "shell",
-            "args": [
-                "build",
-                "--project",
-                "src/earth-now"
-            ],
-            "group": "build",
-            "presentation": {
-                "reveal": "never"
-            },
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "watch-server",
-            "command": "dotnet",
-            "type": "shell",
-            "args": [
-                "watch",
-                "--project",
-                "src/earth-now",
-                "run"
-            ],
-            "group": "test",
-            "presentation": {
-                "reveal": "always",
-                "focus": false,
-                "panel": "dedicated"
-            }
-        },
-        {
             "label": "build-daemon",
             "command": "dotnet",
             "type": "shell",
@@ -44,11 +12,34 @@
                 "--project",
                 "src/wall-daemon"
             ],
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "presentation": {
                 "reveal": "never"
             },
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test-deamon",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "watch",
+                "--project",
+                "src/wall-daemon",
+                "test"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated"
+            }
         },
         {
             "label": "watch-deamon",
