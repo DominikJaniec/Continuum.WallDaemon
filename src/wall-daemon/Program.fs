@@ -1,15 +1,37 @@
 namespace Continuum.WallDaemon
 
 open System
+open Continuum.Common
 open Continuum.WallDaemon.CLI
 
 
 module Program =
 
+    let env =
+        { new ArgsHandler.IEnv with
+
+            override it.printOut (message: string) : unit =
+                Console.WriteLine(message)
+
+            override it.printErr (message: string) : unit =
+                Console.Error.WriteLine(message)
+
+            override it.debugOut (message: string) : unit =
+                it.printOut $"DEBUG: {message}"
+        }
+
     let banner =
-        let line = String.replicate 69 "#"
-        [ line; "Wall Daemon by Dominik Janiec at 12021"; line; "" ]
-        |> String.concat (Environment.NewLine)
+        let width = 69
+        let line = String.replicate width "#"
+        let pilar = String.replicate 3 "#"
+        let header =
+            let sidesSize = 2 * (pilar.Length + 1)
+            "Wall Daemon by Dominik Janiec at 12021"
+            |> String.center (width - sidesSize)
+            |> (fun x -> $"%s{pilar} %s{x} %s{pilar}")
+
+        [ line; header; line; "" ]
+        |> String.lines
 
     let exit =
         {| successful = 0
@@ -17,57 +39,36 @@ module Program =
         ;  fail = 100
         |}
 
-    let printErr (message: string) =
-        Console.Error.WriteLine(message)
-
-    let printOut (message: string) =
-        Console.WriteLine(message)
-
-    let debugOut (message: string) =
-        // System.Diagnostics.Debug.WriteLine(message)
-        printOut $"DEBUG: {message}"
-
-    let environment =
-        { new ArgsHandler.IEnv with
-
-            override _.debugOut (message: string) : unit =
-                debugOut message
-
-            override _.printErr (message: string) : unit =
-                printErr message
-
-            override _.printOut (message: string) : unit =
-                printOut message
-        }
-
-
     [<EntryPoint>]
     let main argv =
 
         if argv |> Array.isEmpty then
             [ banner
             ; Arguments.help ()
-            ] |> List.iter printOut
+            ] |> List.iter env.printOut
 
             exit.successful
 
         else
+            $"Got arguments: %A{argv}"
+            |> env.debugOut
+
             match argv |> Arguments.parse with
             | Error msg ->
-                printErr msg
+                env.printErr msg
                 exit.invalid
 
             | Ok args ->
-                $"Got arguments: %A{args}"
-                |> debugOut
+                $"Parsed arguments: %A{args}"
+                |> env.debugOut
 
                 let executionResult =
-                    (environment, args)
+                    (env, args)
                     ||> ArgsHandler.execute
 
                 match executionResult with
                 | Error (msg, code) ->
-                    printErr msg
+                    env.printErr msg
                     exit.fail
                     + code
 

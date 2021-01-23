@@ -1,5 +1,6 @@
 namespace Continuum.WallDaemon.CLI
 
+open System
 open Argu
 open Continuum.WallDaemon.Core
 open Continuum.WallDaemon.Sources
@@ -85,23 +86,37 @@ module Arguments =
                 | Wall _ -> "manage your desktop Wallpaper."
                 | About -> "learn more about this tool."
 
+    let private spread (args: string array) =
+        let isSingleton =
+            args |> Array.length = 1
+
+        match isSingleton with
+        | false -> args
+        | true ->
+            let arg = args.[0]
+            match arg.Contains ' ' with
+            | false -> args
+            | true ->
+                arg.Split(' ', StringSplitOptions.RemoveEmptyEntries)
 
     let private parser = ArgumentParser.Create<Args>()
+
 
     let help () =
         parser.PrintUsage()
 
     let parse args =
         try
+            let args = spread args
             parser.ParseCommandLine(args)
             |> Ok
 
         with
-        | :? Argu.ArguParseException as arguEx ->
+        | :? ArguParseException as arguEx ->
             arguEx.Message
             |> Error
 
         | ex ->
             let msg = $"Parser encounter a unexpected problem:"
-            System.InvalidOperationException(msg, ex)
+            InvalidOperationException(msg, ex)
             |> raise
