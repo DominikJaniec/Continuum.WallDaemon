@@ -16,10 +16,6 @@ module ArgsHandler =
     type ArgsProfile = ParseResults<ProfileArgs>
     type ArgsResult = Result<unit, string * int>
 
-    type IEnv =
-        abstract member printOut : string -> unit
-        abstract member printErr : string -> unit
-        abstract member debugOut : string -> unit
 
 
     let private todo message = failwith $"TODO | %s{message}"
@@ -79,7 +75,7 @@ module ArgsHandler =
 
                 | Some src ->
                     "Found source providers' by type-name"
-                    + $" with %A{src.Identity} identity"
+                        + $" with %A{src.Identity} identity"
                     |> env.printOut
 
                     if next |> Option.isSome then todoImpl "by with some next"

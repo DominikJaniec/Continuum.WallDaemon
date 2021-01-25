@@ -6,12 +6,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Common/String.fs" />
+    <Compile Include="Core/Env.fs" />
     <Compile Include="Core/Wallpaper.fs" />
     <Compile Include="Core/Windows.fs" />
     <Compile Include="Core/Daemon.fs" />
     <Compile Include="Core/Source.fs" />
     <Compile Include="Sources/Catalog.fs" />
-    <Compile Include="Sources/FilePath.fs" />
+    <!-- <Compile Include="Sources/FilePath.fs" /> -->
     <Compile Include="Sources/Index.fs" />
     <Compile Include="CLI/Arguments.fs" />
     <Compile Include="CLI/ArgsHandler.fs" />

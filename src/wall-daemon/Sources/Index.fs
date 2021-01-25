@@ -7,7 +7,7 @@ module Index =
 
     let private standardProviders =
         [ Catalog.provider ()
-        ; FilePath.provider ()
+        // ; FilePath.provider ()
         ]
 
 

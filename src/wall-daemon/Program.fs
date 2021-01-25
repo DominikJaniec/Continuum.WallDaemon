@@ -2,23 +2,13 @@ namespace Continuum.WallDaemon
 
 open System
 open Continuum.Common
+open Continuum.WallDaemon.Core
 open Continuum.WallDaemon.CLI
 
 
 module Program =
 
-    let env =
-        { new ArgsHandler.IEnv with
-
-            override it.printOut (message: string) : unit =
-                Console.WriteLine(message)
-
-            override it.printErr (message: string) : unit =
-                Console.Error.WriteLine(message)
-
-            override it.debugOut (message: string) : unit =
-                it.printOut $"DEBUG: {message}"
-        }
+    let env = Env.std
 
     let banner =
         let width = 69
