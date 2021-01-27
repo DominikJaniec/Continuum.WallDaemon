@@ -1,5 +1,6 @@
 namespace Continuum.WallDaemon.Sources
 
+open Continuum.WallDaemon.Core
 open Continuum.WallDaemon.Core.Source
 
 
@@ -11,6 +12,9 @@ module Catalog =
         interface ISource with
             member val Identity =
                 Id identity with get
+
+            member x.SetWallpaper (env: IEnv) (config: WallConfig) =
+                Daemon.setWallpaperDemo()
 
     type private Provider() =
         interface IProvider with

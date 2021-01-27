@@ -24,105 +24,122 @@ module ArgsHandler =
     let private argsError message =
         (message, 13) |> Error
 
-    let private or' value = function
+    let private or' value =
+        function
         | None -> value
         | Some x -> x
+
+    let private valueOr defaultVal =
+        function
+        | None -> ValNone
+        | Some None -> ValMiss defaultVal
+        | Some (Some given) -> ValGiven given
+
+
+    let private handleArgs (env: IEnv) (args: ArgsApp) : ArgsResult =
+        todoImpl "base args"
+
+    let private handleService (env: IEnv) (args: ArgsService) =
+        todoImpl "service"
+
+    let private handleProfile (env: IEnv) (args: ArgsProfile) =
+        todoImpl "profile"
+
+    let private handleWall (env: IEnv) (args: ArgsWall) =
+
+        let handleFit fit = todoImpl "just fit"
+        let handleNext next fit = todoImpl "just next"
+
+        let handleBy srcId config next fit =
+            let byIdentity =
+                Identity.from srcId
+                |> Index.sourceBy
+
+            match byIdentity with
+            | None ->
+                let knownProviders =
+                    Index.identities
+                    |> List.map (sprintf "  %s")
+
+                [ "Cannot find requested source provider"
+                    + $" by '%s{srcId}' identity."
+                ; "Known providers' type-name identities:"
+                ; yield! knownProviders
+                ]
+                |> (String.lines >> argsError)
+
+            | Some src ->
+                "Found source providers' by type-name"
+                    + $" with %A{src.Identity} identity"
+                |> env.printOut
+
+
+                let rnd = System.Random()
+                if  rnd.NextDouble() < 0.169 then
+                    ("Ups... Try your lucky again.", 42)
+                    |> Error
+
+                else
+                    let cfgItems = config |> or' []
+                    src.SetWallpaper env
+                        { mode = next
+                        ; style = fit
+                        ; items = cfgItems
+                        }
+
+                    Ok ()
+        let next =
+            args.TryGetResult <@ Next @>
+            |> valueOr wallConst.NextMode
+
+        let fit =
+            args.TryGetResult <@ WallArgs.Fit @>
+            |> valueOr wallConst.WallStyle
+
+        let source = args.TryGetResult <@ By @>
+        let config = args.TryGetResult <@ By_Config @>
+
+        [ "Handling `Wall` sub-command with:"
+        ; sprintf "%A"
+            {| next = next
+            ;  fit = fit
+            ;  source = source
+            ;  config = config
+            |}
+        ]
+        |> (String.lines >> env.debugOut)
+
+        match source, config with
+        | Some source, _ ->
+            handleBy source config next fit
+
+        | None, None ->
+            match next, fit with
+            | ValNone, ValGiven fit
+            | ValNone, ValMiss fit -> handleFit fit
+            | ValGiven next, _
+            | ValMiss next, _ -> handleNext next fit
+
+            | ValNone, ValNone ->
+                "The `wall` sub-command require some parameters"
+                |> argsError
+
+        | None, Some _ ->
+            "Args `--by-config` can be only provided"
+                + " with source identity via `--by`."
+            |> argsError
 
 
     let execute (env: IEnv) (args: ArgsApp) : ArgsResult =
 
-        let handleArgs (args: ArgsApp) : ArgsResult =
-            todoImpl "base args"
-
-        let handleService (args: ArgsService) =
-            todoImpl "service"
-
-        let handleProfile (args: ArgsProfile) =
-            todoImpl "profile"
-
-        let handleWall (args: ArgsWall) =
-            let next =
-                args.TryGetResult <@ Next @>
-                |> Option.map (or' wallConst.NextMode)
-
-            let fit =
-                args.TryGetResult <@ WallArgs.Fit @>
-                |> Option.map (or' wallConst.WallStyle)
-
-            let source = args.TryGetResult <@ By @>
-            let config = args.TryGetResult <@ By_Config @>
-
-            let handleJustNext next = todoImpl "just next"
-            let handleJustFit fit = todoImpl "just fit"
-
-            let handleBy srcId =
-                let byIdentity =
-                    Identity.from srcId
-                    |> Index.sourceBy
-
-                match byIdentity with
-                | None ->
-                    let knownProviders =
-                        Index.identities
-                        |> List.map (sprintf "  %s")
-
-                    [ "Cannot find requested source provider"
-                        + $" by '%s{srcId}' identity."
-                    ; "Known providers' type-name identities:"
-                    ; yield! knownProviders
-                    ]
-                    |> (String.lines >> argsError)
-
-                | Some src ->
-                    "Found source providers' by type-name"
-                        + $" with %A{src.Identity} identity"
-                    |> env.printOut
-
-                    if next |> Option.isSome then todoImpl "by with some next"
-                    if fit |> Option.isSome then todoImpl "by with some fit"
-                    let cfgItems = config |> or' []
-
-                    let rnd = System.Random()
-                    if rnd.NextDouble () < 0.69 then
-                        Daemon.setWallpaperDemo ()
-                        |> Ok
-                    else
-                        ("Ups... Try your lucky again.", 42)
-                        |> Error
-
-            [ "Handling `Wall` sub-command with:"
-            ; sprintf "%A"
-                {| next = next
-                ;  fit = fit
-                ;  source = source
-                ;  config = config
-                |}
-            ]
-            |> (String.lines >> env.debugOut)
-
-            match source, config with
-            | None, None ->
-                match next, fit with
-                | None, Some fit -> handleJustFit fit
-                | Some next, _ -> handleJustNext next
-                | None, None ->
-                    "The `wall` sub-command require some parameters"
-                    |> argsError
-
-            | Some source, _ -> handleBy source
-            | None, Some _ ->
-                "Args `--by-config` can be only provided"
-                + " with source identity via `--by`."
-                |> argsError
-
         match args.TryGetSubCommand () with
-        | None -> handleArgs args
+        | None -> handleArgs env args
         | Some cmd ->
             match cmd with
-            | Service args -> handleService args
-            | Profile args -> handleProfile args
-            | Wall args-> handleWall args
+            | Service args -> handleService env args
+            | Profile args -> handleProfile env args
+            | Wall args-> handleWall env args
             | _ ->
                 "Expected to find a know Sub-Command"
-                + $", instead got args: %A{cmd}."
+                    + $", instead got args: %A{cmd}."
                 |> failwith

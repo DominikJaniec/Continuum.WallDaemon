@@ -20,8 +20,22 @@ module Source =
             |> String.toLower
             |> Id
 
+
+    type CfgValue<'a> =
+        | ValGiven of 'a
+        | ValMiss of 'a
+        | ValNone
+
+    type WallConfig =
+        { mode: CfgValue<NextMode>
+        ; style: CfgValue<WallStyle>
+        ; items: string list
+        }
+
     type ISource =
         abstract member Identity: Identity with get
+        abstract member SetWallpaper: env: IEnv -> config: WallConfig -> unit
+
 
     type IProvider =
         abstract member Identity: Identity with get
