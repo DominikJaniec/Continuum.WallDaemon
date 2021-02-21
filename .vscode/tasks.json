@@ -83,5 +83,23 @@
                 "panel": "shared"
             }
         },
+        {
+            "label": "example-deamon",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "run",
+                "--project",
+                "src/wall-daemon",
+                "--",
+                "wall --by catalog"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "dedicated"
+            }
+        },
     ]
 }

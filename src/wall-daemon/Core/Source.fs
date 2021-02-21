@@ -28,13 +28,17 @@ module Source =
 
     type WallConfig =
         { mode: CfgValue<NextMode>
-        ; style: CfgValue<WallStyle>
         ; items: string list
         }
 
+    type WallDefinition =
+        Order * Wallpaper
+
     type ISource =
         abstract member Identity: Identity with get
-        abstract member SetWallpaper: env: IEnv -> config: WallConfig -> unit
+        abstract member SetWallpaper:
+            env: IEnv -> config: WallConfig
+            -> Async<WallDefinition list>
 
 
     type IProvider =

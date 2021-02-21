@@ -14,7 +14,10 @@ module Catalog =
                 Id identity with get
 
             member x.SetWallpaper (env: IEnv) (config: WallConfig) =
-                Daemon.setWallpaperDemo()
+                async {
+                    Daemon.setWallpaperDemo()
+                    return []
+                }
 
     type private Provider() =
         interface IProvider with

@@ -24,6 +24,9 @@ module ArgsHandler =
     let private argsError message =
         (message, 13) |> Error
 
+    let private asExecError message =
+        (message, 31)
+
     let private or' value =
         function
         | None -> value
@@ -45,7 +48,7 @@ module ArgsHandler =
     let private handleProfile (env: IEnv) (args: ArgsProfile) =
         todoImpl "profile"
 
-    let private handleWall (env: IEnv) (args: ArgsWall) =
+    let private handleWall (env: IEnv) (args: ArgsWall) : ArgsResult =
 
         let handleFit fit = todoImpl "just fit"
         let handleNext next fit = todoImpl "just next"
@@ -73,21 +76,32 @@ module ArgsHandler =
                     + $" with %A{src.Identity} identity"
                 |> env.printOut
 
-
                 let rnd = System.Random()
                 if  rnd.NextDouble() < 0.169 then
                     ("Ups... Try your lucky again.", 42)
                     |> Error
 
                 else
-                    let cfgItems = config |> or' []
-                    src.SetWallpaper env
-                        { mode = next
-                        ; style = fit
-                        ; items = cfgItems
-                        }
+                    let fitHandler =
+                        match fit with
+                        | ValNone -> None
+                        | ValMiss fitStyle
+                        | ValGiven fitStyle ->
+                            fitStyle
+                            |> Executor.letStyle env
+                            |> Some
 
-                    Ok ()
+                    let wallHandler =
+                        let cfgItems = config |> or' []
+                        src.SetWallpaper env
+                            { mode = next
+                            ; items = cfgItems
+                            }
+
+                    (wallHandler, fitHandler)
+                    ||> Executor.makeDesktop env
+                    |> Result.mapError asExecError
+
         let next =
             args.TryGetResult <@ Next @>
             |> valueOr wallConst.NextMode
@@ -121,7 +135,7 @@ module ArgsHandler =
             | ValMiss next, _ -> handleNext next fit
 
             | ValNone, ValNone ->
-                "The `wall` sub-command require some parameters"
+                "The `wall` sub-command require some parameters."
                 |> argsError
 
         | None, Some _ ->

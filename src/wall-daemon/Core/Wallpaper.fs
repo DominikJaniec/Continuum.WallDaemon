@@ -10,4 +10,4 @@ type WallStyle =
     | Span
 
 type Wallpaper =
-    | ImageFile
+    | ImageFile of path: string

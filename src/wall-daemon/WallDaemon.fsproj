@@ -11,6 +11,7 @@
     <Compile Include="Core/Windows.fs" />
     <Compile Include="Core/Daemon.fs" />
     <Compile Include="Core/Source.fs" />
+    <Compile Include="Core/Executor.fs" />
     <Compile Include="Sources/Catalog.fs" />
     <!-- <Compile Include="Sources/FilePath.fs" /> -->
     <Compile Include="Sources/Index.fs" />
