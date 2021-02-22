@@ -91,11 +91,12 @@ module ArgsHandler =
                             |> Executor.letStyle env
                             |> Some
 
-                    let wallHandler =
-                        let cfgItems = config |> or' []
+                    let wallHandler styles =
+                        let items = config |> or' []
                         src.SetWallpaper env
                             { mode = next
-                            ; items = cfgItems
+                            ; styles = styles
+                            ; parameters = items
                             }
 
                     (wallHandler, fitHandler)

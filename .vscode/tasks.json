@@ -92,13 +92,13 @@
                 "--project",
                 "src/wall-daemon",
                 "--",
-                "wall --by catalog"
+                "wall --by catalog --fit centre"
             ],
             "group": "test",
             "presentation": {
                 "reveal": "always",
                 "focus": true,
-                "panel": "dedicated"
+                "panel": "shared"
             }
         },
     ]

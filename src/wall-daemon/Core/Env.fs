@@ -23,7 +23,8 @@ module Env =
         { new IEnv with
 
             override a.displays with get () : Display list =
-                [] // TODO: get displays information from host
+                // TODO: get displays information from host
+                [ { order = No 1u; resolution = (3u, 3u) } ]
 
             override a.printOut (message: string) : unit =
                 Console.WriteLine(message)
