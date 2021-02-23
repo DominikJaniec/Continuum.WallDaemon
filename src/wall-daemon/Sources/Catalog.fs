@@ -2,6 +2,7 @@ namespace Continuum.WallDaemon.Sources
 
 open Continuum.WallDaemon.Core
 open Continuum.WallDaemon.Core.Source
+open Continuum.WallDaemon.Environment
 
 
 module Catalog =

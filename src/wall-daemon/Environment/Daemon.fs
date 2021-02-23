@@ -1,5 +1,7 @@
-namespace Continuum.WallDaemon.Core
+namespace Continuum.WallDaemon.Environment
+
 open System.IO
+open Continuum.WallDaemon.Core
 
 
 module Daemon =

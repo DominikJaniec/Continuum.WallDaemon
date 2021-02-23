@@ -6,6 +6,7 @@ open Continuum.Common
 open Continuum.WallDaemon.Core
 open Continuum.WallDaemon.Core.Source
 open Continuum.WallDaemon.Sources
+open Continuum.WallDaemon.Environment
 
 
 module ArgsHandler =

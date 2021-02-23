@@ -5,13 +5,16 @@
     <RootNamespace>Continuum.WallDaemon</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Common/Async.fs" />
     <Compile Include="Common/String.fs" />
+    <Compile Include="Common/Core.fs" />
     <Compile Include="Core/Env.fs" />
     <Compile Include="Core/Wallpaper.fs" />
-    <Compile Include="Core/Windows.fs" />
-    <Compile Include="Core/Daemon.fs" />
     <Compile Include="Core/Source.fs" />
-    <Compile Include="Core/Executor.fs" />
+    <Compile Include="Environment/Windows.fs" />
+    <Compile Include="Environment/Desktop.fs" />
+    <Compile Include="Environment/Executor.fs" />
+    <Compile Include="Environment/Daemon.fs" />
     <Compile Include="Sources/Catalog.fs" />
     <!-- <Compile Include="Sources/FilePath.fs" /> -->
     <Compile Include="Sources/Index.fs" />

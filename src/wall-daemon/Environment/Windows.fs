@@ -1,8 +1,10 @@
-namespace Continuum.WallDaemon.Core
+namespace Continuum.WallDaemon.Environment
 
 open System
 open System.Runtime.InteropServices
 open Microsoft.Win32
+
+open Continuum.WallDaemon.Core
 
 
 module Windows =

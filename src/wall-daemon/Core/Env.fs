@@ -18,6 +18,10 @@ type IEnv =
 
 module Env =
 
+    let private timestamped message =
+        DateTime.Now.ToString("HH:mm:ss.f")
+        + $"| %s{message}"
+
     let std =
 
         { new IEnv with
@@ -27,10 +31,12 @@ module Env =
                 [ { order = No 1u; resolution = (3u, 3u) } ]
 
             override a.printOut (message: string) : unit =
-                Console.WriteLine(message)
+                timestamped message
+                |> Console.WriteLine
 
             override a.printErr (message: string) : unit =
-                Console.Error.WriteLine(message)
+                timestamped message
+                |> Console.Error.WriteLine
 
             override a.debugOut (message: string) : unit =
                 a.printOut $"DEBUG: {message}"
