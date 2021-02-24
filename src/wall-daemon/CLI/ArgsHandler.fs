@@ -18,10 +18,6 @@ module ArgsHandler =
     type ArgsResult = Result<unit, string * int>
 
 
-
-    let private todo message = failwith $"TODO | %s{message}"
-    let private todoImpl what = todo $"Implement %s{what}"
-
     let private argsError message =
         (message, 13) |> Error
 
@@ -74,7 +70,7 @@ module ArgsHandler =
 
             | Some src ->
                 "Found source providers' by type-name"
-                    + $" with %A{src.Identity} identity"
+                    + $" with identity: %A{src.Identity}"
                 |> env.printOut
 
                 let rnd = System.Random()

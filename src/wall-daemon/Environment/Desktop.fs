@@ -6,13 +6,17 @@ open Continuum.WallDaemon.Core
 
 module Desktop =
 
+    let inline private todoWinErrors msg =
+        "Implement error handler for Windows"
+        |> todo' [ $"Got: %s{msg}"]
+
     let private getAsyncAs name (env: IEnv) action =
         async {
             env.debugOut $"getting Windows' current desktop %s{name}"
             let style = action ()
             return
                 match style with
-                | Error msg -> failwith msg
+                | Error msg -> todoWinErrors msg
                 | Ok result ->
                     env.debugOut $"found desktop %s{name}: '%A{result}'"
                     result
@@ -24,7 +28,7 @@ module Desktop =
             env.debugOut $"setting Windows' current desktop %s{name}"
             let change = action value
             match change with
-            | Error msg -> failwith msg
+            | Error msg -> todoWinErrors msg
             | Ok () ->
                 env.debugOut $"desktop %s{name} changed to: '%A{value}'"
         }
