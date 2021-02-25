@@ -21,7 +21,10 @@ module ArgsHandler =
     let private argsError message =
         (message, 13) |> Error
 
-    let private asExecError message =
+    let private argsError' messageLines =
+        messageLines |> String.lines |> argsError
+
+    let private execError message =
         (message, 31)
 
     let private or' value =
@@ -45,6 +48,7 @@ module ArgsHandler =
     let private handleProfile (env: IEnv) (args: ArgsProfile) =
         todoImpl "profile"
 
+
     let private handleWall (env: IEnv) (args: ArgsWall) : ArgsResult =
 
         let handleFit fit = todoImpl "just fit"
@@ -59,26 +63,32 @@ module ArgsHandler =
             | None ->
                 let knownProviders =
                     Index.identities
-                    |> List.map (sprintf "  %s")
+                    |> List.map (sprintf "  * %s")
 
                 [ "Cannot find requested source provider"
                     + $" by '%s{srcId}' identity."
                 ; "Known providers' type-name identities:"
                 ; yield! knownProviders
                 ]
-                |> (String.lines >> argsError)
+                |> argsError'
 
             | Some src ->
                 "Found source providers' by type-name"
                     + $" with identity: %A{src.Identity}"
                 |> env.printOut
 
-                let rnd = System.Random()
-                if  rnd.NextDouble() < 0.169 then
-                    ("Ups... Try your lucky again.", 42)
-                    |> Error
+                let config  = config |> or' []
+                $"Parsing config item from: %A{config}"
+                |> env.debugOut
 
-                else
+                match config |> src.Parse with
+                | Error err ->
+                    [ $"Source could not parse given config: %A{config}"
+                    ; "Parse result: " + err
+                    ]
+                    |> argsError'
+
+                | Ok configItem ->
                     let fitHandler =
                         match fit with
                         | ValNone -> None
@@ -89,16 +99,23 @@ module ArgsHandler =
                             |> Some
 
                     let wallHandler styles =
-                        let items = config |> or' []
-                        src.SetWallpaper env
+                        let config =
                             { mode = next
                             ; styles = styles
-                            ; parameters = items
+                            ; item = configItem
                             }
+
+                        [ $"Calling ISource.SetWallpaper of '%A{src.Identity}' instance with config:"
+                        ; sprintf "%A" config
+                        ]
+                        |> (String.lines >> env.debugOut)
+
+                        config
+                        |> src.SetWallpaper env
 
                     (wallHandler, fitHandler)
                     ||> Executor.makeDesktop env
-                    |> Result.mapError asExecError
+                    |> Result.mapError execError
 
         let next =
             args.TryGetResult <@ Next @>
@@ -144,14 +161,20 @@ module ArgsHandler =
 
     let execute (env: IEnv) (args: ArgsApp) : ArgsResult =
 
-        match args.TryGetSubCommand () with
-        | None -> handleArgs env args
-        | Some cmd ->
-            match cmd with
-            | Service args -> handleService env args
-            | Profile args -> handleProfile env args
-            | Wall args-> handleWall env args
-            | _ ->
-                "Expected to find a know Sub-Command"
-                    + $", instead got args: %A{cmd}."
-                |> failwith
+        let rnd = System.Random()
+        if  rnd.NextDouble() < 0.069 then
+            ("Ups... Try your lucky again.", 42)
+            |> Error
+
+        else
+            match args.TryGetSubCommand () with
+            | None -> handleArgs env args
+            | Some cmd ->
+                match cmd with
+                | Service args -> handleService env args
+                | Profile args -> handleProfile env args
+                | Wall args-> handleWall env args
+                | _ ->
+                    "Expected to find a know Sub-Command"
+                        + $", instead got args: %A{cmd}."
+                    |> failwith

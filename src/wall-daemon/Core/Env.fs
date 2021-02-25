@@ -5,6 +5,7 @@ open System
 
 type Order =
     | No of uint
+
 type Display =
     { resolution: uint * uint
     ; order: Order

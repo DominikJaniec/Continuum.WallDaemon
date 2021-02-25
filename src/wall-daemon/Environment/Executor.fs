@@ -25,7 +25,7 @@ module Executor =
         | None ->
             async {
                 let! current = getStyle env
-                env.debugOut $"displays have styles: %A{current}"
+                env.debugOut $"displays have styles: '%A{current}'"
 
                 return current
                 |> forAllDisplays env

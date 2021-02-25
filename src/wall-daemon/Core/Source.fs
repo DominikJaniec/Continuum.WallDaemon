@@ -2,10 +2,12 @@ namespace Continuum.WallDaemon.Core
 
 open Continuum.Common
 
+
 type OWallStyle =
     Order * WallStyle
 type OWall =
     Order * Wallpaper
+
 type NextMode =
     | Designed
     | Random
@@ -28,16 +30,23 @@ module Source =
         | ValMiss of 'a
         | ValNone
 
+    type IConfigItem =
+        interface end
+
     type WallConfig =
         { mode: CfgValue<NextMode>
         ; styles: OWallStyle list
-        ; parameters: string list
+        ; item: IConfigItem
         }
 
     type ISource =
         abstract member Identity: Identity with get
-        abstract member SetWallpaper:
-            env: IEnv -> config: WallConfig
+
+        abstract member Parse: config: string list
+            -> Result<IConfigItem, string>
+
+        abstract member SetWallpaper: env: IEnv
+            -> config: WallConfig
             -> Async<OWall list>
 
 

@@ -43,7 +43,7 @@ module Arguments =
 
     let wallConst =
         {| NextMode = NextMode.Designed
-        ;  WallStyle = WallStyle.Fit
+        ;  WallStyle = WallStyle.Fill
         ;  ByProviders = Index.identities
         |}
 

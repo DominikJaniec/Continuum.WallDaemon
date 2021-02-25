@@ -92,7 +92,7 @@
                 "--project",
                 "src/wall-daemon",
                 "--",
-                "wall --by catalog --fit centre"
+                "wall --by catalog --fit centre --by-config \"C:\\Users\\Dominik\\Dropbox\\Tapety\""
             ],
             "group": "test",
             "presentation": {

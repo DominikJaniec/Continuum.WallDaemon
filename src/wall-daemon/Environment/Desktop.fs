@@ -34,6 +34,7 @@ module Desktop =
         }
         |> Async.StartAsync
 
+
     let getStyleAsync env =
         Windows.getWallpaperStyle
         |> getAsyncAs "style" env

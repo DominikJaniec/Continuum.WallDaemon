@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Common/Async.fs" />
+    <Compile Include="Common/Rng.fs" />
     <Compile Include="Common/String.fs" />
     <Compile Include="Common/Core.fs" />
     <Compile Include="Core/Env.fs" />
