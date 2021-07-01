@@ -13,62 +13,47 @@ module Catalog =
 
     let identity = "catalog"
 
-    let private ensureDirectoryExists dir =
-        match dir |> Directory.Exists with
-        | true -> dir
-        | _ -> failwith $"Expected to get existing directory at '%s{dir}'."
-
-
-    type private Model =
-        { source: string
-        ; seed: int64
-        ; n: int
-        }
-
-    let private init dir =
-        let s = DateTime.UtcNow.Ticks
-        { source = dir
-        ; seed = s
-        ; n = 0
-        }
-
-    let private exec (model: Model) matches =
-        let rng =
-            int64 (model.n + 1)
-            |> (*) model.seed
-            |> (int >> Rng)
-
-        let wallpapers =
-            let items =
-                model.source
-                |> ensureDirectoryExists
-                |> Directory.GetFiles
-
-            Seq.initInfinite (fun _ ->
-                items |> Rng.randomItem rng
-            )
-
+    let private ensureDirectoryExists dirPath =
         async {
             return
-                Seq.distinct wallpapers
-                |> Seq.zip matches
-                |> List.ofSeq
+                match dirPath |> Directory.Exists with
+                | true -> dirPath
+                | _ ->
+                    $"Expected to get existing directory at '%s{dirPath}'."
+                    |> failwith
+        }
+
+    let private getFilesAt dirPath =
+        async {
+            let! path =
+                dirPath
+                |> ensureDirectoryExists
+
+            return path
+                |> Directory.GetFiles
         }
 
     type private ConfigItem =
         { dir: string
+        ; seed: int
         }
         with
             interface IConfigItem
+
     module private ConfigItem =
+        let private asConfigItem dirPath =
+            let s = DateTime.UtcNow.Ticks
+            { dir = dirPath
+            ; seed = int s
+            }
+            :> IConfigItem
 
         let private from (value: string) =
             match value |> String.IsNullOrWhiteSpace with
             | true -> None
             | false ->
                 Path.GetFullPath value
-                |> (fun path -> { dir = path })
-                :> IConfigItem
+                |> asConfigItem
                 |> Some
 
         let parse config =
@@ -78,15 +63,29 @@ module Catalog =
             |> Option.bind from
 
 
-    let private getOrders (env: IEnv) =
+    let private shuffledFiles (item: ConfigItem) =
+        let randomItems source =
+            let rng =
+                int item.seed
+                |> Rng
+
+            Seq.initInfinite (fun _ ->
+                source |> Rng.randomItem rng
+            )
+
+        async {
+            let! allAvailableFiles =
+                getFilesAt item.dir
+
+            return
+                allAvailableFiles
+                |> randomItems
+                |> Seq.distinct
+        }
+
+    let private extractOrders (env: IEnv) =
         env.displays
         |> List.map (fun d -> d.order)
-
-    let private asWallpapers =
-        let asOWall (order, path) : OWall =
-            (order, ImageFile path)
-
-        List.map asOWall
 
 
     type private Impl() =
@@ -99,23 +98,28 @@ module Catalog =
                 | Some configItem -> configItem |> Ok
                 | None ->
                     "Expected to find a single configuration parameter,"
-                        + " which represents Wallpapers base catalog path."
+                    + " which represents Wallpapers base catalog path."
                     |> Error
 
             member x.SetWallpaper (env: IEnv) (config: WallConfig) =
                 // TODO: Use config: next-mode and styles
 
-                let baseDir =
-                    (config.item :?> ConfigItem).dir
-                    |> ensureDirectoryExists
+                let asOWall (wallpaper, order) : OWall =
+                    (order, ImageFile wallpaper)
 
                 async {
-                    let model = init baseDir
-                    return!
-                        getOrders env
-                        |> exec model
-                        |> Async.map asWallpapers
+                    let! wallpapers =
+                        config.item
+                        :?> ConfigItem
+                        |> shuffledFiles
+
+                    return
+                        extractOrders env
+                        |> Seq.zip wallpapers
+                        |> Seq.map asOWall
+                        |> List.ofSeq
                 }
+
 
     type private Provider() =
         interface IProvider with

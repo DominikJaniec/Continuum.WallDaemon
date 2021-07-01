@@ -35,7 +35,7 @@ module ArgsHandler =
     let private valueOr defaultVal =
         function
         | None -> ValNone
-        | Some None -> ValMiss defaultVal
+        | Some None -> ValDef defaultVal
         | Some (Some given) -> ValGiven given
 
 
@@ -92,7 +92,7 @@ module ArgsHandler =
                     let fitHandler =
                         match fit with
                         | ValNone -> None
-                        | ValMiss fitStyle
+                        | ValDef fitStyle
                         | ValGiven fitStyle ->
                             fitStyle
                             |> Executor.letStyle env
@@ -145,9 +145,9 @@ module ArgsHandler =
         | None, None ->
             match next, fit with
             | ValNone, ValGiven fit
-            | ValNone, ValMiss fit -> handleFit fit
+            | ValNone, ValDef fit -> handleFit fit
             | ValGiven next, _
-            | ValMiss next, _ -> handleNext next fit
+            | ValDef next, _ -> handleNext next fit
 
             | ValNone, ValNone ->
                 "The `wall` sub-command require some parameters."

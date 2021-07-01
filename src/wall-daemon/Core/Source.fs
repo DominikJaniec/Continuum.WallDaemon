@@ -27,7 +27,7 @@ module Source =
 
     type CfgValue<'a> =
         | ValGiven of 'a
-        | ValMiss of 'a
+        | ValDef of 'a
         | ValNone
 
     type IConfigItem =
