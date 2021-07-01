@@ -33,10 +33,8 @@
             "command": "dotnet",
             "type": "shell",
             "args": [
-                "watch",
-                "--project",
-                "src/wall-daemon",
-                "test"
+                "test",
+                "spec/wall-inferno"
             ],
             "group": {
                 "kind": "test",
@@ -49,14 +47,14 @@
             }
         },
         {
-            "label": "watch-deamon",
+            "label": "watch-test-deamon",
             "command": "dotnet",
             "type": "shell",
             "args": [
                 "watch",
                 "--project",
-                "src/wall-daemon",
-                "run"
+                "spec/wall-inferno",
+                "test"
             ],
             "group": "test",
             "presentation": {
@@ -92,7 +90,7 @@
                 "--project",
                 "src/wall-daemon",
                 "--",
-                "wall --by catalog --fit centre --by-config \"C:\\Users\\Dominik\\Dropbox\\Tapety\""
+                "wall --by catalog --fit centre --by-config \"C:\\Users\\domin\\Dropbox\\Tapety\""
             ],
             "group": "test",
             "presentation": {
