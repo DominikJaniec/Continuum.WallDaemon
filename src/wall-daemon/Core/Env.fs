@@ -3,19 +3,77 @@ namespace Continuum.WallDaemon.Core
 open System
 
 
+[<Measure>]
+type deg
+
+type Width =
+    | W of uint
+
+type Height =
+    | H of uint
+
 type Order =
     | No of uint
 
+module Order =
+    let its value =
+        match value with
+        | No n -> n
+
 type Display =
-    { resolution: uint * uint
+    { resolution: Width * Height
+    ; rotation: int<deg>
     ; order: Order
     }
 
+type Desktop =
+    { displays: Display list
+    ; nickname: string
+    ; order: Order
+    }
+
+[<RequireQualifiedAccess>]
+type SettupConfig =
+    | Gird of Width * Height
+    | Horizon of uint
+    | Circle of uint
+    | Tower of uint
+
+type Settup =
+    { desktops: Desktop list
+    ; config: SettupConfig
+    }
+
+
 type IEnv =
-    abstract member displays: Display list with get
+    abstract member settup: Settup with get
     abstract member printOut : string -> unit
     abstract member printErr : string -> unit
     abstract member debugOut : string -> unit
+
+module Settup =
+
+    let private orderOfDesktop (desktop: Desktop) =
+        desktop.order
+        |> Order.its
+
+    let private orderOfDisplay (display: Display) =
+        display.order
+        |> Order.its
+
+    let private withDisplays (desktop: Desktop) =
+        let displays =
+            desktop.displays
+            |> List.sortBy orderOfDisplay
+
+        (desktop, displays)
+
+    let allDisplaysOf (env: IEnv) =
+        env.settup.desktops
+        |> Seq.sortBy orderOfDesktop
+        |> Seq.map withDisplays
+        |> List.ofSeq
+
 
 module Env =
 
@@ -27,9 +85,25 @@ module Env =
 
         { new IEnv with
 
-            override a.displays with get () : Display list =
+            override a.settup with get () : Settup =
+                let display: Display =
+                    { resolution = (W 2560u, H 1080u)
+                    ; rotation = 0<deg>
+                    ; order = No 1u
+                    }
+
+                let desktop =
+                    { displays = [ display ]
+                    ; nickname = "primary"
+                    ; order = No 1u
+                    }
+
+                let config = SettupConfig.Horizon 1u
+
                 // TODO: get displays information from host
-                [ { order = No 1u; resolution = (3u, 3u) } ]
+                { desktops = [ desktop ]
+                ; config = config
+                }
 
             override a.printOut (message: string) : unit =
                 timestamped message

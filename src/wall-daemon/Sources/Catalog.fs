@@ -2,7 +2,6 @@ namespace Continuum.WallDaemon.Sources
 
 open System
 open System.IO
-open System.Text.RegularExpressions
 
 open Continuum.Common
 open Continuum.WallDaemon.Core
@@ -83,10 +82,6 @@ module Catalog =
                 |> Seq.distinct
         }
 
-    let private extractOrders (env: IEnv) =
-        env.displays
-        |> List.map (fun d -> d.order)
-
 
     type private Impl() =
         interface ISource with
@@ -101,11 +96,12 @@ module Catalog =
                     + " which represents Wallpapers base catalog path."
                     |> Error
 
-            member x.SetWallpaper (env: IEnv) (config: WallConfig) =
+            member x.Wallpapers (env: IEnv) (config: WallConfig) =
+                // TODO: Handle all settups not only random stream
                 // TODO: Use config: next-mode and styles
 
-                let asOWall (wallpaper, order) : OWall =
-                    (order, ImageFile wallpaper)
+                let asWallpaper (wallpaper, target) : TargetedWallpaper =
+                    (ImageFile wallpaper, target)
 
                 async {
                     let! wallpapers =
@@ -114,9 +110,9 @@ module Catalog =
                         |> shuffledFiles
 
                     return
-                        extractOrders env
+                        WallTarget.allOf env
                         |> Seq.zip wallpapers
-                        |> Seq.map asOWall
+                        |> Seq.map asWallpaper
                         |> List.ofSeq
                 }
 

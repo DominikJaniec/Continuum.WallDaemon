@@ -89,16 +89,18 @@ module ArgsHandler =
                     |> argsError'
 
                 | Ok configItem ->
-                    let fitHandler =
+                    let wallStylesSource =
                         match fit with
-                        | ValNone -> None
+                        | ValNone ->
+                            Executor.getStyles env
+
                         | ValDef fitStyle
                         | ValGiven fitStyle ->
-                            fitStyle
-                            |> Executor.letStyle env
-                            |> Some
+                            WallTarget.allOf env
+                            |> List.map (fun t -> (fitStyle, t))
+                            |> Executor.setStyles env
 
-                    let wallHandler styles =
+                    let wallpapersSource styles =
                         let config =
                             { mode = next
                             ; styles = styles
@@ -111,10 +113,10 @@ module ArgsHandler =
                         |> (String.lines >> env.debugOut)
 
                         config
-                        |> src.SetWallpaper env
+                        |> src.Wallpapers env
 
-                    (wallHandler, fitHandler)
-                    ||> Executor.makeDesktop env
+                    (wallStylesSource, wallpapersSource)
+                    ||> Executor.makeDesktopSettup env
                     |> Result.mapError execError
 
         let next =

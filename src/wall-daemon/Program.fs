@@ -1,6 +1,5 @@
 namespace Continuum.WallDaemon
 
-open System
 open Continuum.Common
 open Continuum.WallDaemon.Core
 open Continuum.WallDaemon.CLI

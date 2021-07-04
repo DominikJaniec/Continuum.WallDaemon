@@ -8,46 +8,73 @@ module Desktop =
 
     let inline private todoWinErrors msg =
         "Implement error handler for Windows"
-        |> todo' [ $"Got: %s{msg}"]
+        |> todo' [ $"Got: %s{msg}" ]
 
-    let private getAsyncAs name (env: IEnv) action =
+    let private progressSleep =
+        // TODO: find better *progress indicator*
+        Async.sleepOneSecond
+
+    let private targetedAt (target: WallTarget) action =
+        match target with
+        | ({ order = No 1u }, { order = No 1u }) ->
+            // TODO: pass a correct target
+            Windows.DID 0u
+            |> action
+
+        | _ -> todoImpl "multi-display setup"
+
+
+    let private getAsyncAs name (env: IEnv) target action =
         async {
-            env.debugOut $"getting Windows' current desktop %s{name}"
-            let style = action ()
+            let targetName = target |> WallTarget.stringify
+            $"getting Windows' current %s{name} of %s{targetName}"
+            |> env.debugOut
+
+            let style = action |> targetedAt target
+            do! progressSleep
+
             return
                 match style with
                 | Error msg -> todoWinErrors msg
                 | Ok result ->
-                    env.debugOut $"found desktop %s{name}: '%A{result}'"
+                    $"found %s{name} of %s{targetName}: '%A{result}'"
+                    |> env.debugOut
+
                     result
         }
         |> Async.StartAsync
 
-    let private setAsyncAs name (env: IEnv) value action =
+    let private setAsyncAs name (env: IEnv) target value action =
         async {
-            env.debugOut $"setting Windows' current desktop %s{name}"
-            let change = action value
+            let targetName = target |> WallTarget.stringify
+            $"setting Windows' current %s{name} of %s{targetName}"
+            |> env.debugOut
+
+            let change = action value |> targetedAt target
+            do! progressSleep
+
             match change with
             | Error msg -> todoWinErrors msg
             | Ok () ->
-                env.debugOut $"desktop %s{name} changed to: '%A{value}'"
+                $"%s{name} of %s{targetName} changed to: '%A{value}'"
+                |> env.debugOut
         }
         |> Async.StartAsync
 
 
-    let getStyleAsync env =
-        Windows.getWallpaperStyle
-        |> getAsyncAs "style" env
+    let getStyleAsync env target =
+        (fun did -> Windows.getWallpaperStyle ())
+        |> getAsyncAs "style" env target
 
-    let getWallpaperAsync env =
-        Windows.getWallpaperImagePath
-        >> asOk' "No path found."
-        |> getAsyncAs "wallpaper" env
+    let getWallpaperAsync env target =
+        (fun did -> Windows.getWallpaperImagePath ())
+        >> asOk' "No wallpaper path found."
+        |> getAsyncAs "wallpaper" env target
 
-    let setStyleAsync env style =
-        (style, Windows.setWallpaperStyle)
-        ||> setAsyncAs "style" env
+    let setStyleAsync env target style =
+        (style, (fun s did -> Windows.setWallpaperStyle s))
+        ||> setAsyncAs "style" env target
 
-    let setWallpaperAsync env imgPath =
-        (imgPath, Windows.setWallpaperImage)
-        ||> setAsyncAs "wallpaper" env
+    let setWallpaperAsync env target imgPath =
+        (imgPath, (fun s did -> Windows.setWallpaperImage s))
+        ||> setAsyncAs "wallpaper" env target

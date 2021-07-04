@@ -18,3 +18,13 @@ module Async =
             let! r = a
             return r
         }
+
+    let SequentialList computations =
+        async {
+            let! xs =
+                computations
+                |> Async.Sequential
+
+            return xs
+                |> List.ofArray
+        }

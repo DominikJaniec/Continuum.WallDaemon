@@ -118,6 +118,9 @@ module Windows =
         |> Error
 
 
+    type DisplayId =
+        | DID of uint
+
     let getWallpaperImagePath () =
         use key = RegKey.openDesktopRegistry ReadOnly
         key |> readWallpaperPath

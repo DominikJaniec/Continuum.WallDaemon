@@ -6,85 +6,70 @@ open Continuum.WallDaemon.Core
 
 module Executor =
 
-    type LetStyle = Async<OWallStyle list>
-    type LetWall = Async<OWall list>
+    let private ensureNotEmpty xs =
+        match xs with
+        | [] -> failwith "Unexpected empty list."
+        | [ x ] -> [ x ]
+        | _ -> todoImpl "multi-display setup support"
 
 
-    let private getStyle = Desktop.getStyleAsync
-    let private setStyle = Desktop.setStyleAsync
-
-    let private getWallpaper = Desktop.getWallpaperAsync
-    let private setWallpaper = Desktop.setWallpaperAsync
-
-    let private forAllDisplays (env: IEnv) x =
-        env.displays
-        |> List.map (fun d -> d.order, x)
-
-    let private makeStyle (env: IEnv) (styleSetter: LetStyle option) =
-        match styleSetter with
-        | None ->
-            async {
-                let! current = getStyle env
-                env.debugOut $"displays have styles: '%A{current}'"
-
-                return current
-                |> forAllDisplays env
-            }
-        | Some changeStyle ->
-            async {
-                let! changed = changeStyle
-                do! Async.sleepOneSecond
-
-                env.debugOut $"displays got styles: %A{changed}"
-                return changed
-            }
-
-    let private makeWall (env: IEnv) (wallpapers: OWall list) =
-        let makeWallPath wallpaper =
+    let private setWallpapers (env: IEnv) (wallpapers: Wallpapers) =
+        let extractFilePathFrom wallpaper =
             match wallpaper with
             | ImageFile path ->
                 async { return path }
 
-        match wallpapers with
-        | [] -> failwith "Unexpected empty list of wallpapers."
-        | [ No 1u, wallpaper ] ->
+        let setWallpaper (wallpaper, target) =
             async {
-                let! path = makeWallPath wallpaper
-                env.debugOut $"changing wallpaper to: '%s{path}'"
-
-                do! path |> setWallpaper env
-                env.debugOut "wallpaper successfully changed"
-
+                let! path = extractFilePathFrom wallpaper
+                do! path |> Desktop.setWallpaperAsync env target
                 return ()
             }
-        | _ -> todoImpl "multi-display setup"
+
+        wallpapers
+        |> ensureNotEmpty
+        |> List.map setWallpaper
+        |> Async.Sequential
+        |> Async.Ignore
 
 
-    let letStyle (env: IEnv) (style: WallStyle) : LetStyle =
+    let getStyles env =
+        let getStyleAt target =
+            async {
+                let! current = Desktop.getStyleAsync env target
+                return (current, target)
+            }
+
+        WallTarget.allOf env
+        |> ensureNotEmpty
+        |> Seq.map getStyleAt
+        |> Async.SequentialList
+
+
+    let setStyles env (wallStyles: WallStyles) =
+        let setStyle targetedWallStyle =
+            let (wallStyle, target) = targetedWallStyle
+            async {
+                do! Desktop.setStyleAsync env target wallStyle
+                return targetedWallStyle
+            }
+
+        wallStyles
+        |> ensureNotEmpty
+        |> Seq.map setStyle
+        |> Async.SequentialList
+
+
+    let makeDesktopSettup
+        env
+        (wallStylesSource: Async<WallStyles>)
+        (wallpapersSource: WallStyles -> Async<Wallpapers>) =
         async {
-            let! current = getStyle env
-            do!
-                match style = current with
-                | true -> async { return () }
-                | false -> setStyle env style
-
-            return style
-            |> forAllDisplays env
-        }
-
-    let makeDesktop (env: IEnv)
-        (wallSource: OWallStyle list -> LetWall)
-        (styleSetter: LetStyle option) =
-
-        let styleSetAction =
-            styleSetter
-            |> makeStyle env
-
-        async {
-            let! styles = styleSetAction
-            let! walls = wallSource styles
-            do! walls |> makeWall env
+            let! styles = wallStylesSource
+            let! walls = wallpapersSource styles
+            do! walls |> setWallpapers env
             return ()
         }
         |> Async.RunSynchronously
+        // TODO: handle errors?
         |> Ok
