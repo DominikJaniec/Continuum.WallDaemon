@@ -10,6 +10,15 @@ module Core =
         | Some x -> x |> asOk
         | None -> orVal |> asErr
 
+    let withFst tuple value =
+        let second = tuple |> snd
+        (value, second)
+
+    let withSnd tuple value =
+        let first = tuple |> fst
+        (first, value)
+
+
 [<AutoOpen>]
 module Core_ToDo =
 

@@ -1,12 +1,27 @@
 namespace Continuum.Common
 
+open System.Text.RegularExpressions
+open System
+
+
 module String =
+
+    let nl = "\n"
+
+    let asSafe (str: string) =
+        match str |> isNull with
+        | true -> None
+        | _ -> Some str
 
     let toLower (str: string) =
         str.ToLowerInvariant()
 
     let toUpper (str: string) =
         str.ToUpperInvariant()
+
+    let hasLines (str: string) =
+        // TODO: less exploitable
+        str.Contains(nl)
 
     let lines items =
         String.concat "\n" items

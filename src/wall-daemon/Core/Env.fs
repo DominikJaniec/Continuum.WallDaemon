@@ -1,6 +1,7 @@
 namespace Continuum.WallDaemon.Core
 
 open System
+open Continuum.Common
 
 
 [<Measure>]
@@ -77,9 +78,27 @@ module Settup =
 
 module Env =
 
+    let private timestamped' header message =
+        let timestamp =
+            DateTime.Now.ToString("HH:mm:ss.f")
+
+        let prefix = $" %s{header}"
+
+        let separator =
+            match message |> String.hasLines with
+            | true -> "/" + String.nl
+            | _ -> "| "
+
+        String.concat ""
+            [ timestamp
+            ; prefix
+            ; separator
+            ; message
+            ]
+
     let private timestamped message =
-        DateTime.Now.ToString("HH:mm:ss.f")
-        + $"| %s{message}"
+        timestamped' "" message
+
 
     let std =
 
@@ -114,5 +133,6 @@ module Env =
                 |> Console.Error.WriteLine
 
             override a.debugOut (message: string) : unit =
-                a.printOut $"DEBUG: {message}"
+                timestamped' "DEBUG" message
+                |> Console.WriteLine
         }
