@@ -64,6 +64,23 @@
             }
         },
         {
+            "label": "watch-hades",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "watch",
+                "--project",
+                "src/wall-hades",
+                "run"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "focus": false,
+                "panel": "dedicated"
+            }
+        },
+        {
             "label": "call-deamon",
             "command": "dotnet",
             "type": "shell",
