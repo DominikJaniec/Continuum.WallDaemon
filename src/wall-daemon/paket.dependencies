@@ -1,5 +1,0 @@
-source https://api.nuget.org/v3/index.json
-
-nuget Argu
-nuget FSharp.Core
-nuget Microsoft.Win32.Registry

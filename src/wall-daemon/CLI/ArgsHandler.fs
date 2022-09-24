@@ -108,7 +108,7 @@ module ArgsHandler =
                             }
 
                         [ $"Calling ISource.SetWallpaper of '%A{src.Identity}' instance with config:"
-                        ; sprintf "%A" config
+                        ; $"%A{config}"
                         ]
                         |> (String.lines >> env.debugOut)
 

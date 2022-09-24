@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EBDC8881-EB14-4A25-8E2E-1765688A55D1}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WallDaemon", "src\wall-daemon\WallDaemon.fsproj", "{553D9696-53BE-4339-9784-B615B9C11980}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "spec", "spec", "{38C731F7-39DF-4CB3-8BD8-B6A1FCA136E8}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WallInferno.Specs", "spec\wall-inferno\WallInferno.Specs.fsproj", "{44E20ABD-E5B2-403B-881F-55A664A5CC9F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{553D9696-53BE-4339-9784-B615B9C11980}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{553D9696-53BE-4339-9784-B615B9C11980}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{553D9696-53BE-4339-9784-B615B9C11980}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{553D9696-53BE-4339-9784-B615B9C11980}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44E20ABD-E5B2-403B-881F-55A664A5CC9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44E20ABD-E5B2-403B-881F-55A664A5CC9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44E20ABD-E5B2-403B-881F-55A664A5CC9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44E20ABD-E5B2-403B-881F-55A664A5CC9F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{553D9696-53BE-4339-9784-B615B9C11980} = {EBDC8881-EB14-4A25-8E2E-1765688A55D1}
+		{44E20ABD-E5B2-403B-881F-55A664A5CC9F} = {38C731F7-39DF-4CB3-8BD8-B6A1FCA136E8}
+	EndGlobalSection
+EndGlobal

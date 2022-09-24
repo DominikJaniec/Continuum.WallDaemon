@@ -114,7 +114,7 @@ module Windows =
         RegKey.tryGetString regKeys.WallPaper
 
     let private errorUnknownConfig configValue =
-        sprintf "Unknown %A configuration" configValue
+        $"Unknown %A{configValue} configuration"
         |> Error
 
 

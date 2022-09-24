@@ -12,6 +12,22 @@
     ],
     "tasks": [
         {
+            "label": "build-continuum",
+            "command": "dotnet",
+            "type": "shell",
+            "args": [
+                "build"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "never"
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "build-daemon",
             "command": "dotnet",
             "type": "shell",
@@ -19,10 +35,7 @@
                 "build",
                 "src/wall-daemon"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "presentation": {
                 "reveal": "never"
             },
@@ -98,6 +111,6 @@
                 "focus": true,
                 "panel": "shared"
             }
-        },
+        }
     ]
 }

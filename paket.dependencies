@@ -1,0 +1,12 @@
+source https://api.nuget.org/v3/index.json
+
+storage: none
+framework: auto-detect
+
+nuget FSharp.Core content: none
+nuget Argu
+nuget coverlet.collector
+nuget Microsoft.NET.Test.Sdk
+nuget Microsoft.Win32.Registry
+nuget xunit
+nuget xunit.runner.visualstudio

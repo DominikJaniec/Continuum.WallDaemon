@@ -15,7 +15,7 @@ module Program =
         let pilar = String.replicate 3 "#"
         let header =
             let sidesSize = 2 * (pilar.Length + 1)
-            "Wall Daemon by Dominik Janiec at 12021"
+            "Wall Daemon by Dominik Janiec at 12022"
             |> String.center (width - sidesSize)
             |> (fun x -> $"%s{pilar} %s{x} %s{pilar}")
 

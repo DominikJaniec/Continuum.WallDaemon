@@ -1,9 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Continuum.WallDaemon</RootNamespace>
   </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="Common/Async.fs" />
     <Compile Include="Common/Rng.fs" />
@@ -23,5 +26,7 @@
     <Compile Include="CLI/ArgsHandler.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-  <Import Project=".paket\Paket.Restore.targets" />
+
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+
 </Project>
